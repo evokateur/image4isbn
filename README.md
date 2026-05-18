@@ -79,7 +79,8 @@ open report.html
 
 Uploads the cover images to Square and attaches them to the matching catalog items.
 
->[!note] There might be a download step missing..
+> [!note]
+> There might be a download step missing...
 
 ```bash
 attach-images < records-final.jsonl
