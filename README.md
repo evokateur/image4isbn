@@ -125,11 +125,19 @@ uv run scripts/fetch_random_isbns.py --count 5 | to-records | find-covers --sour
 
 ## Configuration
 
-> *explain configuration here*
+Copy `.env.example` to `.env` and fill in the values.
 
 ```bash
-cp .env.example .env  # fill in credentials
+cp .env.example .env
 ```
+
+| Variable | Required | Description |
+|---|---|---|
+| `SQUARE_ACCESS_TOKEN` | Yes | Your Square Developer access token |
+| `SQUARE_ENVIRONMENT` | Yes | `sandbox` for testing, `production` for the real catalog |
+| `SQUARE_ISBN_FIELD` | Yes | The catalog attribute key where ISBNs are stored — run `discover` to find it |
+| `SQUARE_EXTRA_FIELDS` | No | Comma-separated list of additional catalog fields to carry through the pipeline (e.g. `title,author`) |
+| `GOOGLE_BOOKS_API_KEY` | No | Only required when using `--source google` |
 
 ## Installation
 
