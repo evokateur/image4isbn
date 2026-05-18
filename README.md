@@ -40,7 +40,7 @@ A record for which an image was found (will be flattened in the `.jsonl`):
 }
 ```
 
-A record for which no image was found:
+A record for which an image was NOT found:
 
 ```json
 {
