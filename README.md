@@ -21,7 +21,7 @@ fetch-items > records.jsonl
 
 ### `find-covers`
 
-Makes API calls to find cover images for each item in a records file, adding a collection of `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
+Makes API calls to find cover images for each item in a records file, adding `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
 
 A record for which an image was found (will be flattened in the `.jsonl`):
 
