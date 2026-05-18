@@ -4,11 +4,11 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve data
 
 ## Tools
 
-### `fetch-items`
+### `fetch-items` (unfinished)
 
 Pulls items from a Square catalog and creates a JSONL records file.
 
-Example output with arbitrary configured fields (see Configuration below):
+Example output with arbitrary additional attributes (see Configuration below):
 
 ```jsonl
 {"id": "item-id-1", "title": "Book Title", "isbn": "9781234567890"}
@@ -21,7 +21,7 @@ fetch-items > records.jsonl
 
 ### `find-covers`
 
-Makes API calls to find cover images for each item in a records file, adding a collection of `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
+Makes API calls to find cover images for each item in a records file, adding `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
 
 A record for which an image was found (will be flattened in the `.jsonl`):
 
@@ -40,7 +40,7 @@ A record for which an image was found (will be flattened in the `.jsonl`):
 }
 ```
 
-A record for which no image was found:
+A record for which an image was NOT found:
 
 ```json
 {
@@ -75,9 +75,12 @@ summarize < records-final.jsonl > report.html
 open report.html
 ```
 
-### `attach-images`
+### `attach-images` (unfinished)
 
 Uploads the cover images to Square and attaches them to the matching catalog items.
+
+> [!note]
+> There might be a download step missing...
 
 ```bash
 attach-images < records-final.jsonl
@@ -95,7 +98,7 @@ attach-images < records-with-covers.jsonl
 
 ### `to-records`
 
-Creates records for each line in a list of ISBNs, usable as input for `find-covers`.
+Creates records, one for each line in a list of ISBNs, usable as input for `find-covers`:
 
 ```bash
 echo "9780802190734" | to-records | find-covers --source open_library | jq .
@@ -119,6 +122,7 @@ echo "9780802190734" | to-records | find-covers --source open_library | jq .
 }
 ```
 
+Look at those pipes!
 ```bash
 uv run scripts/fetch_random_isbns.py --count 5 | to-records | \
 find-covers --source open_library | summarize > report.html && open report.html
@@ -135,13 +139,13 @@ Copy `.env.example` to `.env` and fill in the values.
 cp .env.example .env
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `SQUARE_ACCESS_TOKEN` | Yes | Your Square Developer access token |
-| `SQUARE_ENVIRONMENT` | Yes | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_FIELD` | Yes | The catalog attribute key where ISBNs are stored — run `discover` to find it |
-| `SQUARE_EXTRA_FIELDS` | No | Comma-separated list of additional catalog fields to carry through the pipeline (e.g. `title,author`) |
-| `GOOGLE_BOOKS_API_KEY` | No | Only required when using `--source google` |
+| Variable | Description |
+|---|---|
+| `SQUARE_ACCESS_TOKEN` | Square Developer access token |
+| `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
+| `SQUARE_ISBN_FIELD` | The catalog attribute key where ISBNs are stored |
+| `SQUARE_EXTRA_FIELDS` | Additional attributes (comma separated) to carry along the pipeline (e.g. `id, title`) |
+| `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
 
 ## Installation
 
