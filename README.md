@@ -95,7 +95,7 @@ attach-images < records-with-covers.jsonl
 
 ### `to-records`
 
-Creates records for each line in a list of ISBNs, usable as input for `find-covers`.
+Creates records, one for each line in a list of ISBNs, usable as input for `find-covers`.
 
 ```bash
 echo "9780802190734" | to-records | find-covers --source open_library | jq .
