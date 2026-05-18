@@ -110,6 +110,8 @@ def main():
         if not line:
             continue
         record = json.loads(line)
+        if not isinstance(record, dict):
+            raise ValueError(f"expected a JSON object, got: {line.strip()!r}")
 
         if should_skip(record, args.source, args.append, args.force):
             print(json.dumps(record))

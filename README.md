@@ -1,56 +1,138 @@
 # image4isbn
 
-Fetches book cover images by ISBN and attaches them to a Square catalog.
+A set of tools to find cover images for ISBNs, with the ability to retrieve data from and update images in a Square catalog.
 
-## Setup
+## Tools
 
-```bash
-cp .env.example .env  # fill in credentials
-uv tool install -e .
+### `fetch-items`
+
+Pulls items from a Square catalog and creates a records file (`.jsonl`)
+
+Example output with arbitrary configured fields (only `isbn` is required for the next steps):
+
+```jsonl
+{"id": "item-id-1", "title": "Book Title", "isbn": "9781234567890"}
+{"id": "item-id-2", "title": "Another Book", "isbn": "9780987654321"}
 ```
-
-## Discovery
-
-Before running against the client's catalog, identify which Square catalog field holds the ISBN:
-
-```bash
-discover
-```
-
-Set `SQUARE_ISBN_FIELD` in `.env` based on the output.
-
-## Usage
-
-Full pipeline:
-
-```bash
-fetch-items | find-covers --source open_library | attach-images
-```
-
-With Google Books as a gap-filler (1,000 req/day limit):
 
 ```bash
 fetch-items > records.jsonl
-find-covers --source open_library < records.jsonl > records-ol.jsonl
-find-covers --source google --append < records-ol.jsonl > records-final.jsonl
+```
+
+### `find-covers`
+
+Makes API calls to find cover images for each item in a records file, adding a collection of `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
+
+A record for which an image was found (will be flattened in the `.jsonl`):
+
+```json
+{
+  "id": "item-id-1",
+  "title": "Book Title",
+  "isbn": "9781234567890",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9781234567890-L.jpg"
+    }
+  ],
+  "failed_api_calls": []
+}
+```
+
+A record for which no image was found:
+
+```json
+{
+  "id": "item-id-2",
+  "title": "Another Book",
+  "isbn": "9780987654321",
+  "images": [],
+  "failed_api_calls": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780987654321-L.jpg",
+      "status": 404,
+      "result": "not_found"
+    }
+  ]
+}
+```
+
+```bash
+find-covers --source open_library < records.jsonl > records-with-covers.jsonl
+
+# fill gaps with Google Books (requires GOOGLE_BOOKS_API_KEY; 1,000/day free tier)
+find-covers --source google --append < records-with-covers.jsonl > records-final.jsonl
+```
+
+### `summarize`
+
+Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
+
+```bash
+summarize < records-final.jsonl > report.html
+open report.html
+```
+
+### `attach-images`
+
+Uploads the cover images to Square and attaches them to the matching catalog items.
+
+```bash
 attach-images < records-final.jsonl
 ```
 
-Test `find-covers` without Square credentials:
+### Example pipeline usage
 
 ```bash
-cat isbns.txt | to-records | find-covers --source open_library
+fetch-items > records.jsonl
+find-covers --source open_library < records.jsonl > records-with-covers.jsonl
+summarize < records-with-covers.jsonl > report.html && open report.html
+# review report, then:
+attach-images < records-with-covers.jsonl
 ```
 
-## Flags
+### `to-records`
 
-`find-covers --source <source> [--append] [--force]`
+Creates a records file for each line in a list of ISBNs usable as input for `find-covers`.
 
-- default: skip records that already have any image
-- `--append`: skip records that already have an image from this source; use to augment with a second source
-- `--force`: process all records regardless
+```bash
+echo "9780802190734" | to-records | find-covers --source open_library | jq .
+```
 
-## Sources
+```json
+{
+  "isbn": "9780802190734",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
+        "called_at": "2026-05-18T15:36:08Z",
+        "status": 200
+      }
+    }
+  ],
+  "failed_api_calls": []
+}
+```
 
-- `open_library` — no daily quota; throttled to 2 req/s; primary source for bulk runs
-- `google` — requires `GOOGLE_BOOKS_API_KEY`; 1,000 req/day free tier
+```bash
+uv run scripts/fetch_random_isbns.py --count 5 | to-records | find-covers --source open_library | summarize > report.html && open report.html
+```
+
+## Configuration
+
+> *explain configuration here*
+
+```bash
+cp .env.example .env  # fill in credentials
+```
+
+## Installation
+
+```bash
+uv tool install -e .
+```

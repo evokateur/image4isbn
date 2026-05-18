@@ -13,6 +13,7 @@ find-covers = "image4isbn.find_covers:main"
 fetch-items = "image4isbn.fetch_items:main"
 attach-images = "image4isbn.attach_images:main"
 discover = "image4isbn.discover:main"
+summarize = "image4isbn.summarize:main"
 
 [build-system]
 requires = ["hatchling"]
