@@ -122,6 +122,7 @@ echo "9780802190734" | to-records | find-covers --source open_library | jq .
 }
 ```
 
+Look at those pipes!
 ```bash
 uv run scripts/fetch_random_isbns.py --count 5 | to-records | \
 find-covers --source open_library | summarize > report.html && open report.html
