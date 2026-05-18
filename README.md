@@ -144,7 +144,7 @@ cp .env.example .env
 | `SQUARE_ACCESS_TOKEN` | Square Developer access token |
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
 | `SQUARE_ISBN_FIELD` | The catalog attribute key where ISBNs are stored |
-| `SQUARE_EXTRA_FIELDS` | Additional attributed to carry along the pipeline (e.g. `"id, title"`) |
+| `SQUARE_EXTRA_FIELDS` | Additional attributes (comma separated) to carry along the pipeline (e.g. `id, title`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
 
 ## Installation
