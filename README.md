@@ -120,8 +120,12 @@ echo "9780802190734" | to-records | find-covers --source open_library | jq .
 ```
 
 ```bash
-uv run scripts/fetch_random_isbns.py --count 5 | to-records | find-covers --source open_library | summarize > report.html && open report.html
+uv run scripts/fetch_random_isbns.py --count 5 | to-records | \
+find-covers --source open_library | summarize > report.html && open report.html
 ```
+
+<img width="603" height="351" alt="Capture d’écran 2026-05-18 à 08 56 54" src="https://github.com/user-attachments/assets/29f608e5-8bef-43d9-bf33-cbcce4d54451" />
+
 
 ## Configuration
 
