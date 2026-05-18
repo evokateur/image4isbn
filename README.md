@@ -135,13 +135,13 @@ Copy `.env.example` to `.env` and fill in the values.
 cp .env.example .env
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `SQUARE_ACCESS_TOKEN` | Yes | Your Square Developer access token |
-| `SQUARE_ENVIRONMENT` | Yes | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_FIELD` | Yes | The catalog attribute key where ISBNs are stored — run `discover` to find it |
-| `SQUARE_EXTRA_FIELDS` | No | Comma-separated list of additional catalog fields to carry through the pipeline (e.g. `title,author`) |
-| `GOOGLE_BOOKS_API_KEY` | No | Only required when using `--source google` |
+| Variable | Description |
+|---|---|
+| `SQUARE_ACCESS_TOKEN` | Square Developer access token |
+| `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
+| `SQUARE_ISBN_FIELD` | The catalog attribute key where ISBNs are stored |
+| `SQUARE_EXTRA_FIELDS` | Additional attributed to carry along the pipeline (e.g. `"id, title"`) |
+| `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
 
 ## Installation
 
