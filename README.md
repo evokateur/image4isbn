@@ -8,7 +8,7 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve data
 
 Pulls items from a Square catalog and creates a JSONL records file.
 
-Example output with arbitrary configured fields (see Configuration below):
+Example output with arbitrary additional attributes (see Configuration below):
 
 ```jsonl
 {"id": "item-id-1", "title": "Book Title", "isbn": "9781234567890"}
