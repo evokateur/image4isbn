@@ -1,0 +1,19 @@
+[project]
+name = "image4isbn"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "requests",
+    "python-dotenv",
+]
+
+[project.scripts]
+to-records = "image4isbn.to_records:main"
+find-covers = "image4isbn.find_covers:main"
+fetch-items = "image4isbn.fetch_items:main"
+attach-images = "image4isbn.attach_images:main"
+discover = "image4isbn.discover:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
