@@ -1,6 +1,6 @@
 # image4isbn
 
-Fetches book cover images by ISBN and attaches them to a Square catalog.
+The main idea is to fetch book cover images by ISBN. The gravy will be attaching them to items in a Square catalog.
 
 ## Setup
 
