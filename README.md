@@ -4,7 +4,7 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve data
 
 ## Tools
 
-### `fetch-items`
+### `fetch-items` (unfinished)
 
 Pulls items from a Square catalog and creates a JSONL records file.
 
@@ -75,9 +75,11 @@ summarize < records-final.jsonl > report.html
 open report.html
 ```
 
-### `attach-images`
+### `attach-images` (unfinished)
 
 Uploads the cover images to Square and attaches them to the matching catalog items.
+
+>[!note] There might be a download step missing..
 
 ```bash
 attach-images < records-final.jsonl
@@ -95,7 +97,7 @@ attach-images < records-with-covers.jsonl
 
 ### `to-records`
 
-Creates records, one for each line in a list of ISBNs, usable as input for `find-covers`.
+Creates records, one for each line in a list of ISBNs, usable as input for `find-covers`:
 
 ```bash
 echo "9780802190734" | to-records | find-covers --source open_library | jq .
