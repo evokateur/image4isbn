@@ -10,6 +10,7 @@ dependencies = [
 [project.scripts]
 to-records = "image4isbn.to_records:main"
 find-covers = "image4isbn.find_covers:main"
+download-covers = "image4isbn.download_covers:main"
 fetch-items = "image4isbn.fetch_items:main"
 attach-images = "image4isbn.attach_images:main"
 discover = "image4isbn.discover:main"

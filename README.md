@@ -71,19 +71,40 @@ find-covers --source google --append < records-with-covers.jsonl > records-final
 Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
 
 ```bash
-summarize < records-final.jsonl > report.html
+summarize < records-with-covers.jsonl > report.html
 open report.html
+```
+
+### `download-covers`
+
+Downloads each cover image to disk as `<isbn>.jpg` and adds a `local_path` to each record.
+
+```json
+{
+  "id": "item-id-1",
+  "title": "Book Title",
+  "isbn": "9781234567890",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9781234567890-L.jpg",
+      "local_path": "covers/9781234567890.jpg"
+    }
+  ],
+  "failed_api_calls": []
+}
+```
+
+```bash
+download-covers < records-with-covers.jsonl > records-downloaded.jsonl
 ```
 
 ### `attach-images` (unfinished)
 
-Uploads the cover images to Square and attaches them to the matching catalog items.
-
-> [!note]
-> There might be a download step missing...
+Reads each record's local image file and uploads it to Square, attaching it to the matching catalog item. Square does not accept image URLs — it requires file uploads.
 
 ```bash
-attach-images < records-final.jsonl
+attach-images < records-downloaded.jsonl
 ```
 
 ### Example pipeline usage
@@ -93,7 +114,8 @@ fetch-items > records.jsonl
 find-covers --source open_library < records.jsonl > records-with-covers.jsonl
 summarize < records-with-covers.jsonl > report.html && open report.html
 # review report, then:
-attach-images < records-with-covers.jsonl
+download-covers < records-with-covers.jsonl > records-downloaded.jsonl
+attach-images < records-downloaded.jsonl
 ```
 
 ### `to-records`
@@ -123,13 +145,13 @@ echo "9780802190734" | to-records | find-covers --source open_library | jq .
 ```
 
 Look at those pipes!
+
 ```bash
 uv run scripts/fetch_random_isbns.py --count 5 | to-records | \
 find-covers --source open_library | summarize > report.html && open report.html
 ```
 
 <img width="603" height="351" alt="Capture d’écran 2026-05-18 à 08 56 54" src="https://github.com/user-attachments/assets/29f608e5-8bef-43d9-bf33-cbcce4d54451" />
-
 
 ## Configuration
 
@@ -145,6 +167,7 @@ cp .env.example .env
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
 | `SQUARE_ISBN_FIELD` | The catalog attribute key where ISBNs are stored |
 | `SQUARE_EXTRA_FIELDS` | Additional attributes (comma separated) to carry along the pipeline (e.g. `id, title`) |
+| `COVERS_DIR` | Directory for downloaded cover images (default: `covers`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
 
 ## Installation
