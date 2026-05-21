@@ -30,7 +30,7 @@ def has_image(catalog_object) -> bool:
 
 
 def to_item(catalog_object) -> dict:
-    item = {"item_id": catalog_object.id, "isbn": extract_isbn(catalog_object)}
+    item = {"id": catalog_object.id, "isbn": extract_isbn(catalog_object)}
     item_data = catalog_object.item_data
     for field in EXTRA_FIELDS:
         if item_data and hasattr(item_data, field):

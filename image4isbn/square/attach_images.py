@@ -52,7 +52,7 @@ def main():
         item = json.loads(line)
         counts["total"] += 1
 
-        item_id = item.get("item_id")
+        item_id = item.get("id")
         if not item_id:
             counts["no_item_id"] += 1
             print(json.dumps(item))
