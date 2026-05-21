@@ -7,8 +7,8 @@ from square.environment import SquareEnvironment
 
 load_dotenv()
 
-ISBN_FIELD = os.getenv("SQUARE_ISBN_FIELD", "isbn")
-EXTRA_FIELDS = [f.strip() for f in os.getenv("SQUARE_EXTRA_FIELDS", "").split(",") if f.strip()]
+ISBN_ATTRIBUTE_NAME = os.getenv("SQUARE_ISBN_ATTRIBUTE_NAME", "isbn")
+OTHER_ATTRIBUTE_NAMES = [f.strip() for f in os.getenv("SQUARE_OTHER_ATTRIBUTE_NAMES", "").split(",") if f.strip()]
 
 
 def square_client():
@@ -17,9 +17,21 @@ def square_client():
     return Square(token=os.getenv("SQUARE_ACCESS_TOKEN"), environment=environment)
 
 
+def find_attribute_by_name(catalog_object, name: str):
+    name_lower = name.lower()
+    for variation in (catalog_object.item_data and catalog_object.item_data.variations or []):
+        for attr in (variation.custom_attribute_values or {}).values():
+            if attr.name and attr.name.lower() == name_lower:
+                return attr
+    for attr in (catalog_object.custom_attribute_values or {}).values():
+        if attr.name and attr.name.lower() == name_lower:
+            return attr
+    return None
+
+
 def extract_isbn(catalog_object) -> str | None:
-    # TODO: implement after running square-discover against the client's catalog
-    raise NotImplementedError
+    attr = find_attribute_by_name(catalog_object, ISBN_ATTRIBUTE_NAME)
+    return attr.string_value if attr else None
 
 
 def has_image(catalog_object) -> bool:
@@ -31,10 +43,10 @@ def has_image(catalog_object) -> bool:
 
 def to_item(catalog_object) -> dict:
     item = {"id": catalog_object.id, "isbn": extract_isbn(catalog_object)}
-    item_data = catalog_object.item_data
-    for field in EXTRA_FIELDS:
-        if item_data and hasattr(item_data, field):
-            item[field] = getattr(item_data, field)
+    for name in OTHER_ATTRIBUTE_NAMES:
+        attr = find_attribute_by_name(catalog_object, name)
+        if attr:
+            item[name.lower()] = attr.string_value
     return item
 
 
