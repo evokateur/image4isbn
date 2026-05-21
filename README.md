@@ -170,12 +170,68 @@ Reads: `images[].url`; Appends: `images[].local_path`
 
 ### `square-attach-images`
 
-Uploads each record's image to Square, attaching it to the matching catalog item, and adding additional fields...
+Uploads each item's cover image to Square, attaching it to the matching catalog item.
 
-Reads: `id`, `images[].local_path`; Appends: ?
+Reads: `id`, `images[].local_path`; Appends: `images[].attached.square_image_id`
 
 ```sh
-square-attach-images < items-downloaded.jsonl > items-attached.jsonl
+√ ~ $ square-fetch-items | find-covers --source open_library | download-covers | square-attach-images | jq .
+Total items:            3
+No item_id:             0
+No cover:               1
+Already attached:       0
+Images attached:        2
+```
+
+```json
+{
+  "id": "Q6O257AKWZXONAM33IDHVJDS",
+  "isbn": "9780140434088",
+  "title": "The Moonstone",
+  "author": "Wilkie Collins",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780140434088-L.jpg",
+      "local_path": "covers/9780140434088.jpg",
+      "attached": {
+        "square_image_id": "WF5PEFDHAEGJ64TRY2K2KI3C"
+      }
+    }
+  ],
+  "failed_api_calls": []
+}
+{
+  "id": "BVOI6U7ULAOQ6NSCGSOZUHOP",
+  "isbn": "9780816628773",
+  "title": "The Practice of Everyday Life, Vol. 2: Living and Cooking",
+  "author": "Michel de Certeau",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780816628773-L.jpg",
+      "local_path": "covers/9780816628773.jpg",
+      "attached": {
+        "square_image_id": "2TFHAT3L4EBJSWKTF4QROXM7"
+      }
+    }
+  ],
+  "failed_api_calls": []
+}
+{
+  "id": "KITW7KPCX5QGP5Q2ET34FXZA",
+  "isbn": "9780517414248",
+  "title": "Mary Queen of Scots",
+  "author": "Antonia Fraser",
+  "images": [],
+  "failed_api_calls": [
+    {
+      "url": "https://covers.openlibrary.org/b/isbn/9780517414248-L.jpg",
+      "status": 200,
+      "result": "placeholder"
+    }
+  ]
+}
 ```
 
 ### `to-items`
