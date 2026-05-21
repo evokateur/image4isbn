@@ -104,6 +104,8 @@ Generates an HTML report showing how many covers were found, a sample of the mat
 √ ~ $ open report.html
 ```
 
+<img width="576" height="458" alt="sample-cover-image-report" src="https://github.com/user-attachments/assets/696f3fbf-535e-49ee-bbcb-a1964cc614c5" />
+
 ### `download-covers`
 
 Downloads each image to a directory as `<isbn>.jpg`.
