@@ -236,12 +236,12 @@ Images attached:        2
 
 ### `to-items`
 
-Emits JSONL with an item for each ISBN in the input stream
+Emits an item with an isbn as JSONL for each line in the input stream
 
 Appends: `isbn`
 
 ```sh
-√ ~ $ echo "9780802190734" | to-items | jq . # or cat isbns.txt..
+√ ~ $ echo "9780802190734" | to-items | jq . # or cat isbns.txt | to-items..
 ```
 
 ```json
