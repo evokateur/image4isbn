@@ -165,8 +165,8 @@ cp .env.example .env
 |---|---|
 | `SQUARE_ACCESS_TOKEN` | Square Developer access token |
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_FIELD` | The catalog attribute key where ISBNs are stored |
-| `SQUARE_EXTRA_FIELDS` | Additional attributes (comma separated) to carry along the pipeline (e.g. `name, description`) |
+| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the custom attribute where ISBNs are stored (e.g. `isbn`) |
+| `SQUARE_OTHER_ATTRIBUTE_NAMES` | Names of other custom attributes to carry along the pipeline, comma-separated (e.g. `title, author`) |
 | `COVERS_DIR` | Directory for downloaded cover images (default: `covers`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
 
