@@ -1,6 +1,6 @@
 # image4isbn
 
-A set of tools to find cover images for ISBNs, with the ability to retrieve data from and update images in a Square catalog.
+A set of tools to find cover images for ISBNs, with the ability to retrieve items and update images in a Square catalog.
 
 ## Tools
 
@@ -8,15 +8,30 @@ Composable into pipelines connected by a stream of items as JSONL data. Schema i
 
 ### `square-fetch-items`
 
-Fetches items from a Square catalog, emitting JSONL.
+Fetches items from a Square catalog, emitting JSONL
 
-```jsonl
-{"id": "item-id-1", "isbn": "9781234567890"}
-{"id": "item-id-2", "isbn": "9780987654321"}
-```
+Reads: nothing; Appends: `id`, `isbn`, and attributes specified in `SQUARE_OTHER_ATTRIBUTE_NAMES`)
 
 ```sh
-square-fetch-items > items.jsonl
+√ ~ $ square-fetch-items | jq .
+{
+  "id": "Q6O257AKWZXONAM33IDHVJDS",
+  "isbn": "9780140434088",
+  "title": "The Moonstone",
+  "author": "Wilkie Collins"
+}
+{
+  "id": "BVOI6U7ULAOQ6NSCGSOZUHOP",
+  "isbn": "9780816628773",
+  "title": "The Practice of Everyday Life, Vol. 2: Living and Cooking",
+  "author": "Michel de Certeau"
+}
+{
+  "id": "KITW7KPCX5QGP5Q2ET34FXZA",
+  "isbn": "9780517414248",
+  "title": "Mary Queen of Scots",
+  "author": "Antonia Fraser"
+}
 ```
 
 ### `find-covers`
@@ -25,44 +40,59 @@ Makes API calls to find cover images for each item.
 
 Reads: `isbn`; Appends: `images`, `failed_api_calls`
 
-An pretty-printed item for which an image was found (will be flattened in the JSONL):
-
-```json
+```sh
+√ ~ $ square-fetch-items | find-covers --source open_library | jq .
 {
-  "id": "item-id-1",
-  "title": "Book Title",
-  "isbn": "9781234567890",
+  "id": "Q6O257AKWZXONAM33IDHVJDS",
+  "isbn": "9780140434088",
+  "title": "The Moonstone",
+  "author": "Wilkie Collins",
   "images": [
     {
       "source": "open_library",
-      "url": "https://covers.openlibrary.org/b/isbn/9781234567890-L.jpg"
+      "url": "https://covers.openlibrary.org/b/isbn/9780140434088-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780140434088-L.jpg",
+        "called_at": "2026-05-21T21:02:52Z",
+        "status": 200
+      }
     }
   ],
   "failed_api_calls": []
 }
-```
-
-An item for which an image was NOT found:
-
-```json
 {
-  "id": "item-id-2",
-  "title": "Another Book",
-  "isbn": "9780987654321",
+  "id": "BVOI6U7ULAOQ6NSCGSOZUHOP",
+  "isbn": "9780816628773",
+  "title": "The Practice of Everyday Life, Vol. 2: Living and Cooking",
+  "author": "Michel de Certeau",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780816628773-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780816628773-L.jpg",
+        "called_at": "2026-05-21T21:02:53Z",
+        "status": 200
+      }
+    }
+  ],
+  "failed_api_calls": []
+}
+{
+  "id": "KITW7KPCX5QGP5Q2ET34FXZA",
+  "isbn": "9780517414248",
+  "title": "Mary Queen of Scots",
+  "author": "Antonia Fraser",
   "images": [],
   "failed_api_calls": [
     {
-      "source": "open_library",
-      "url": "https://covers.openlibrary.org/b/isbn/9780987654321-L.jpg",
-      "status": 404,
-      "result": "not_found"
+      "url": "https://covers.openlibrary.org/b/isbn/9780517414248-L.jpg",
+      "called_at": "2026-05-21T21:03:00Z",
+      "status": 200,
+      "result": "placeholder"
     }
   ]
 }
-```
-
-```sh
-find-covers --source open_library < items.jsonl > items-covers.jsonl
 ```
 
 ### `summarize`
@@ -70,8 +100,8 @@ find-covers --source open_library < items.jsonl > items-covers.jsonl
 Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
 
 ```sh
-summarize < items-covers.jsonl > report.html
-open report.html
+√ ~ $ square-fetch-items | find-covers --source open_library | summarize > report.html
+√ ~ $ open report.html
 ```
 
 ### `download-covers`
@@ -80,29 +110,65 @@ Downloads each image to a directory as `<isbn>.jpg`.
 
 Reads: `images[].url`; Appends: `images[].local_path`
 
-```json
+```sh
 {
-  "id": "item-id-1",
-  "title": "Book Title",
-  "isbn": "9781234567890",
+  "id": "Q6O257AKWZXONAM33IDHVJDS",
+  "isbn": "9780140434088",
+  "title": "The Moonstone",
+  "author": "Wilkie Collins",
   "images": [
     {
       "source": "open_library",
-      "url": "https://covers.openlibrary.org/b/isbn/9781234567890-L.jpg",
-      "local_path": "covers/9781234567890.jpg"
+      "url": "https://covers.openlibrary.org/b/isbn/9780140434088-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780140434088-L.jpg",
+        "called_at": "2026-05-21T21:24:40Z",
+        "status": 200
+      },
+      "local_path": "docs/covers/9780140434088.jpg"
     }
   ],
   "failed_api_calls": []
 }
-```
-
-```sh
-download-covers --dir ./covers < items-covers.jsonl > items-downloaded.jsonl
+{
+  "id": "BVOI6U7ULAOQ6NSCGSOZUHOP",
+  "isbn": "9780816628773",
+  "title": "The Practice of Everyday Life, Vol. 2: Living and Cooking",
+  "author": "Michel de Certeau",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780816628773-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780816628773-L.jpg",
+        "called_at": "2026-05-21T21:24:40Z",
+        "status": 200
+      },
+      "local_path": "docs/covers/9780816628773.jpg"
+    }
+  ],
+  "failed_api_calls": []
+}
+{
+  "id": "KITW7KPCX5QGP5Q2ET34FXZA",
+  "isbn": "9780517414248",
+  "title": "Mary Queen of Scots",
+  "author": "Antonia Fraser",
+  "images": [],
+  "failed_api_calls": [
+    {
+      "url": "https://covers.openlibrary.org/b/isbn/9780517414248-L.jpg",
+      "called_at": "2026-05-21T21:24:41Z",
+      "status": 200,
+      "result": "placeholder"
+    }
+  ]
+}
 ```
 
 ### `square-attach-images`
 
-Uploads each record's image to Square, attaching it to the matching catalog item, and adding additional fields... *waves hands*
+Uploads each record's image to Square, attaching it to the matching catalog item, and adding additional fields...
 
 Reads: `id`, `images[].local_path`; Appends: ?
 
@@ -110,19 +176,9 @@ Reads: `id`, `images[].local_path`; Appends: ?
 square-attach-images < items-downloaded.jsonl > items-attached.jsonl
 ```
 
-### Example pipeline usage
-
-```sh
-square-fetch-items > items.jsonl
-find-covers --source open_library < items.jsonl > items-ol.jsonl
-find-covers --source google --append < items-ol.jsonl > items-covers.jsonl
-download-covers --dir ./covers < items-covers.jsonl > items-downloaded.jsonl
-square-attach-images < items-downloaded.jsonl > items-attached.jsonl
-```
-
 ### `to-items`
 
-Creates an item with an ISBN for each line in a stream, suitable for input to `find-covers`
+Creates an item for each ISBN in the input stream, which can then be piped to `find-covers`  
 
 ```sh
 echo "9780802190734" | to-items | find-covers --source open_library | jq .
@@ -165,7 +221,7 @@ cp .env.example .env
 |---|---|
 | `SQUARE_ACCESS_TOKEN` | Square Developer access token |
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the custom attribute where ISBNs are stored (e.g. `isbn`) |
+| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the custom attribute where ISBNs are stored. Only needed if it is not `isbn`, which is assumed. |
 | `SQUARE_OTHER_ATTRIBUTE_NAMES` | Names of other custom attributes to carry along the pipeline, comma-separated (e.g. `title, author`) |
 | `COVERS_DIR` | Directory for downloaded cover images (default: `covers`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
