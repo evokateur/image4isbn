@@ -10,7 +10,7 @@ Composable into pipelines connected by a stream of items as JSONL data. Schema i
 
 Fetches items from a Square catalog, emitting JSONL
 
-Reads: nothing; Appends: `id`, `isbn`, and attributes specified in `SQUARE_OTHER_ATTRIBUTE_NAMES`)
+Appends: `id`, `isbn`, and attributes specified in `SQUARE_OTHER_ATTRIBUTE_NAMES`)
 
 ```sh
 √ ~ $ square-fetch-items | jq .
@@ -236,7 +236,9 @@ Images attached:        2
 
 ### `to-items`
 
-Creates an item for each ISBN in the input stream
+Emits JSONL with an item for each ISBN in the input stream
+
+Appends: `isbn`
 
 ```sh
 √ ~ $ echo "9780802190734" | to-items | jq . # or cat isbns.txt..
