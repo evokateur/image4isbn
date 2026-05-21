@@ -4,9 +4,17 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve data
 
 ## Tools
 
-### `fetch-items` (unfinished)
+### `square-discover` (unfinished)
 
-Pulls items from a Square catalog and creates a JSONL records file.
+Fetches a sample of catalog items from Square and prints their raw JSON structure. Run this first to identify where ISBNs are stored in the catalog before running `square-fetch-items`.
+
+```bash
+square-discover
+```
+
+### `square-fetch-items` (unfinished)
+
+Pulls items from a Square catalog and creates a JSONL items file.
 
 Example output with arbitrary additional attributes (see Configuration below):
 
@@ -16,12 +24,49 @@ Example output with arbitrary additional attributes (see Configuration below):
 ```
 
 ```bash
-fetch-items > records.jsonl
+square-fetch-items > items.jsonl
 ```
+
+### `to-items`
+
+Creates JSON records, one for each line in a stream of ISBNs, usable as input for `find-covers`
+
+Can be used by piping in a file or even:
+
+```bash
+echo "9780802190734" | to-items | find-covers --source open_library | jq .
+```
+
+```json
+{
+  "isbn": "9780802190734",
+  "images": [
+    {
+      "source": "open_library",
+      "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
+      "api_call": {
+        "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
+        "called_at": "2026-05-18T15:36:08Z",
+        "status": 200
+      }
+    }
+  ],
+  "failed_api_calls": []
+}
+```
+
+Look at those pipes!
+
+```bash
+uv run scripts/fetch_random_isbns.py --count 5 | to-items | \
+find-covers --source open_library | summarize > report.html && open report.html
+```
+
+<img width="603" height="351" alt="Capture d'écran 2026-05-18 à 08 56 54" src="https://github.com/user-attachments/assets/29f608e5-8bef-43d9-bf33-cbcce4d54451" />
 
 ### `find-covers`
 
-Makes API calls to find cover images for each item in a records file, adding `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
+Makes API calls to find cover images for each item in a items file, adding `images` and `failed_api_calls` to each. At this point only the `isbn` field is required for the API call and other fields pass through.
 
 A record for which an image was found (will be flattened in the `.jsonl`):
 
@@ -60,10 +105,10 @@ A record for which an image was NOT found:
 ```
 
 ```bash
-find-covers --source open_library < records.jsonl > records-with-covers.jsonl
+find-covers --source open_library < items.jsonl > items-covers.jsonl
 
 # fill gaps with Google Books (requires GOOGLE_BOOKS_API_KEY; 1,000/day free tier)
-find-covers --source google --append < records-with-covers.jsonl > records-final.jsonl
+find-covers --source google --append < items-covers.jsonl > records-final.jsonl
 ```
 
 ### `summarize`
@@ -71,7 +116,7 @@ find-covers --source google --append < records-with-covers.jsonl > records-final
 Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
 
 ```bash
-summarize < records-with-covers.jsonl > report.html
+summarize < items-covers.jsonl > report.html
 open report.html
 ```
 
@@ -96,62 +141,27 @@ Downloads each cover image to disk as `<isbn>.jpg` and adds a `local_path` to ea
 ```
 
 ```bash
-download-covers < records-with-covers.jsonl > records-downloaded.jsonl
+download-covers < items-covers.jsonl > items-downloaded.jsonl
 ```
 
-### `attach-images` (unfinished)
+### `square-attach-images` (unfinished)
 
 Reads each record's local image file and uploads it to Square, attaching it to the matching catalog item. Square does not accept image URLs — it requires file uploads.
 
 ```bash
-attach-images < records-downloaded.jsonl
+square-attach-images < items-downloaded.jsonl
 ```
 
 ### Example pipeline usage
 
 ```bash
-fetch-items > records.jsonl
-find-covers --source open_library < records.jsonl > records-with-covers.jsonl
-summarize < records-with-covers.jsonl > report.html && open report.html
+square-fetch-items > items.jsonl
+find-covers --source open_library < items.jsonl > items-covers.jsonl
+summarize < items-covers.jsonl > report.html && open report.html
 # review report, then:
-download-covers < records-with-covers.jsonl > records-downloaded.jsonl
-attach-images < records-downloaded.jsonl
+download-covers < items-covers.jsonl > items-downloaded.jsonl
+square-attach-images < items-downloaded.jsonl
 ```
-
-### `to-records`
-
-Creates records, one for each line in a list of ISBNs, usable as input for `find-covers`:
-
-```bash
-echo "9780802190734" | to-records | find-covers --source open_library | jq .
-```
-
-```json
-{
-  "isbn": "9780802190734",
-  "images": [
-    {
-      "source": "open_library",
-      "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
-      "api_call": {
-        "url": "https://covers.openlibrary.org/b/isbn/9780802190734-L.jpg",
-        "called_at": "2026-05-18T15:36:08Z",
-        "status": 200
-      }
-    }
-  ],
-  "failed_api_calls": []
-}
-```
-
-Look at those pipes!
-
-```bash
-uv run scripts/fetch_random_isbns.py --count 5 | to-records | \
-find-covers --source open_library | summarize > report.html && open report.html
-```
-
-<img width="603" height="351" alt="Capture d’écran 2026-05-18 à 08 56 54" src="https://github.com/user-attachments/assets/29f608e5-8bef-43d9-bf33-cbcce4d54451" />
 
 ## Configuration
 

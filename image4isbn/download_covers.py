@@ -10,12 +10,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def download(record, output_dir):
-    images = record.get("images", [])
+def download(item, output_dir):
+    images = item.get("images", [])
     if not images:
-        return record
+        return item
 
-    isbn = record.get("isbn", "unknown")
+    isbn = item.get("isbn", "unknown")
     updated = []
 
     for i, image in enumerate(images):
@@ -38,7 +38,7 @@ def download(record, output_dir):
 
         updated.append({**image, "local_path": str(local_path)})
 
-    return {**record, "images": updated}
+    return {**item, "images": updated}
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
         line = line.strip()
         if not line:
             continue
-        record = json.loads(line)
-        if not isinstance(record, dict):
+        item = json.loads(line)
+        if not isinstance(item, dict):
             raise ValueError(f"expected a JSON object, got: {line!r}")
-        print(json.dumps(download(record, output_dir)))
+        print(json.dumps(download(item, output_dir)))

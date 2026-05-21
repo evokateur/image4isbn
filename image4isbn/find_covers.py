@@ -78,18 +78,18 @@ def source_tag(source):
     return source
 
 
-def enrich_record(record, images, failed_calls):
+def enrich_item(item, images, failed_calls):
     return {
-        **record,
-        "images": record.get("images", []) + images,
-        "failed_api_calls": record.get("failed_api_calls", []) + failed_calls,
+        **item,
+        "images": item.get("images", []) + images,
+        "failed_api_calls": item.get("failed_api_calls", []) + failed_calls,
     }
 
 
-def should_skip(record, source, append, force):
+def should_skip(item, source, append, force):
     if force:
         return False
-    existing = record.get("images", [])
+    existing = item.get("images", [])
     if append:
         return any(img.get("source") == source_tag(source) for img in existing)
     return bool(existing)
@@ -109,21 +109,21 @@ def main():
         line = line.strip()
         if not line:
             continue
-        record = json.loads(line)
-        if not isinstance(record, dict):
+        item = json.loads(line)
+        if not isinstance(item, dict):
             raise ValueError(f"expected a JSON object, got: {line.strip()!r}")
 
-        if should_skip(record, args.source, args.append, args.force):
-            print(json.dumps(record))
+        if should_skip(item, args.source, args.append, args.force):
+            print(json.dumps(item))
             continue
 
-        isbn = record.get("isbn")
+        isbn = item.get("isbn")
         if not isbn:
-            print(json.dumps(record))
+            print(json.dumps(item))
             continue
 
         images, failed_calls = lookup_image(isbn, args.source)
-        print(json.dumps(enrich_record(record, images, failed_calls)))
+        print(json.dumps(enrich_item(item, images, failed_calls)))
 
         if args.source == "open_library":
             time.sleep(OPEN_LIBRARY_REQUEST_INTERVAL)
