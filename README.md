@@ -100,8 +100,7 @@ Reads: `isbn`; Appends: `images`, `failed_api_calls`
 Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
 
 ```sh
-√ ~ $ square-fetch-items | find-covers --source open_library | summarize > report.html
-√ ~ $ open report.html
+√ ~ $ square-fetch-items | find-covers --source open_library | summarize > report.html && open report.html
 ```
 
 <img width="576" height="458" alt="sample-cover-image-report" src="https://github.com/user-attachments/assets/696f3fbf-535e-49ee-bbcb-a1964cc614c5" />
