@@ -14,8 +14,10 @@ find-covers = "image4isbn.find_covers:main"
 download-covers = "image4isbn.download_covers:main"
 square-fetch-items = "image4isbn.square.fetch_items:main"
 square-attach-images = "image4isbn.square.attach_images:main"
-square-discover = "image4isbn.square.discover:main"
 summarize = "image4isbn.summarize:main"
+
+[dependency-groups]
+dev = ["pytest"]
 
 [build-system]
 requires = ["hatchling"]
