@@ -146,7 +146,7 @@ download-covers < items-covers.jsonl > items-downloaded.jsonl
 
 ### `square-attach-images` (unfinished)
 
-Reads each record's local image file and uploads it to Square, attaching it to the matching catalog item. Square does not accept image URLs — it requires file uploads.
+Uploads each record's image to Square, attaching it to the matching catalog item, and adding additional fields... *waves hands*
 
 ```bash
 square-attach-images < items-downloaded.jsonl
