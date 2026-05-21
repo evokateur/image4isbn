@@ -236,7 +236,19 @@ Images attached:        2
 
 ### `to-items`
 
-Creates an item for each ISBN in the input stream, which can then be piped to `find-covers`  
+Creates an item for each ISBN in the input stream
+
+```sh
+√ ~ $ echo "9780802190734" | to-items | jq . # or cat isbns.txt..
+```
+
+```json
+{
+  "isbn": "9780802190734"
+}
+```
+
+...which can be piped into `find-covers`  
 
 ```sh
 echo "9780802190734" | to-items | find-covers --source open_library | jq .
@@ -260,6 +272,8 @@ echo "9780802190734" | to-items | find-covers --source open_library | jq .
 }
 ```
 
+I really like pipes.
+
 ```sh
 uv run scripts/fetch_random_isbns.py --count 5 | to-items | \
 find-covers --source open_library | summarize > report.html && open report.html
@@ -279,7 +293,7 @@ cp .env.example .env
 |---|---|
 | `SQUARE_ACCESS_TOKEN` | Square Developer access token |
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the custom attribute where ISBNs are stored. Only needed if it is not `isbn`, which is assumed. |
+| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the Square custom attribute for ISBNs. Only needed if it is *not* `isbn`, which is assumed. |
 | `SQUARE_OTHER_ATTRIBUTE_NAMES` | Names of other custom attributes to carry along the pipeline, comma-separated (e.g. `title, author`) |
 | `COVERS_DIR` | Directory for downloaded cover images (default: `covers`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
