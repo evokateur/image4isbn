@@ -63,9 +63,6 @@ An item for which an image was NOT found:
 
 ```sh
 find-covers --source open_library < items.jsonl > items-covers.jsonl
-
-# fill gaps with Google Books (requires GOOGLE_BOOKS_API_KEY; 1,000/day free tier)
-find-covers --source google --append < items-covers.jsonl > records-final.jsonl
 ```
 
 ### `summarize`
