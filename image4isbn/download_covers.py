@@ -46,7 +46,7 @@ def main():
     parser.add_argument("--dir", default=os.getenv("COVERS_DIR", "covers"))
     args = parser.parse_args()
 
-    output_dir = Path(args.dir)
+    output_dir = Path(args.dir).expanduser()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for line in sys.stdin:
