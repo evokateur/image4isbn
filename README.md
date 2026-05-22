@@ -175,7 +175,7 @@ Reads: `id`, `images[].local_path`; Appends: `images[].attached.square_image_id`
 
 ```sh
 √ ~ $ square-fetch-items | find-covers --source open_library | download-covers | square-attach-images | jq .
-Total items:            3
+Total items:            3 # stderr
 No item_id:             0
 No cover:               1
 Already attached:       0
