@@ -26,3 +26,15 @@ def catalog_item():
             variations=[variation],
         ),
     )
+
+
+@pytest.fixture
+def catalog_item_with_image():
+    return CatalogObject_Item(
+        type="ITEM",
+        id="Q6O257AKWZXONAM33IDHVJDS",
+        item_data=CatalogItem(
+            name="The Moonstone",
+            image_ids=["WF5PEFDHAEGJ64TRY2K2KI3C"],
+        ),
+    )

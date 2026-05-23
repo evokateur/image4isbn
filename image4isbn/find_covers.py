@@ -89,6 +89,8 @@ def enrich_item(item, images, failed_calls):
 def should_skip(item, source, append, force):
     if force:
         return False
+    if item.get("has_square_image"):
+        return True
     existing = item.get("images", [])
     if append:
         return any(img.get("source") == source_tag(source) for img in existing)
