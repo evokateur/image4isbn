@@ -42,7 +42,11 @@ def has_image(catalog_object) -> bool:
 
 
 def to_item(catalog_object) -> dict:
-    item = {"id": catalog_object.id, "isbn": extract_isbn(catalog_object)}
+    item = {
+        "id": catalog_object.id,
+        "isbn": extract_isbn(catalog_object),
+        "has_square_image": has_image(catalog_object),
+    }
     for name in OTHER_ATTRIBUTE_NAMES:
         attr = find_attribute_by_name(catalog_object, name)
         if attr:
@@ -53,6 +57,4 @@ def to_item(catalog_object) -> dict:
 def main():
     client = square_client()
     for catalog_object in client.catalog.list(types="ITEM"):
-        if has_image(catalog_object):
-            continue
         print(json.dumps(to_item(catalog_object)))
