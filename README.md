@@ -4,7 +4,7 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve item
 
 ## Tools
 
-Composable into pipelines connected by a stream of items as JSONL data. Schema is append-only. Fields are added as the item moves through the pipeline. Nothing is ever removed or mutated.
+Composable into pipelines connected by a stream of JSONL data. Schema is append-only. Fields are added as items move through the pipeline. Nothing is  removed or mutated.
 
 ### `square-fetch-items`
 
