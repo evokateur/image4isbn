@@ -21,8 +21,8 @@ def square_client():
     return Square(token=os.getenv("SQUARE_ACCESS_TOKEN"), environment=environment)
 
 
-def make_idempotency_key(item_id: str) -> str:
-    return str(uuid.uuid5(IDEMPOTENCY_NAMESPACE, item_id))
+def make_idempotency_key(item_id: str, image_url: str) -> str:
+    return str(uuid.uuid5(IDEMPOTENCY_NAMESPACE, f"{item_id}:{image_url}"))
 
 
 def attach(client, item_id: str, image: dict) -> dict:
@@ -30,7 +30,7 @@ def attach(client, item_id: str, image: dict) -> dict:
     with open(local_path, "rb") as f:
         response = client.catalog.images.create(
             request={
-                "idempotency_key": make_idempotency_key(item_id),
+                "idempotency_key": make_idempotency_key(item_id, image["url"]),
                 "object_id": item_id,
                 "image": {"type": "IMAGE", "id": "#TEMP_IMAGE", "image_data": {}},
                 "is_primary": True,
