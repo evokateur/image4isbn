@@ -79,9 +79,11 @@ def source_tag(source):
 
 
 def enrich_item(item, images, failed_calls):
+    existing_urls = {img["url"] for img in item.get("images", []) if img.get("url")}
+    new_images = [img for img in images if img.get("url") not in existing_urls]
     return {
         **item,
-        "images": item.get("images", []) + images,
+        "images": item.get("images", []) + new_images,
         "failed_api_calls": item.get("failed_api_calls", []) + failed_calls,
     }
 
