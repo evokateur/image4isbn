@@ -248,7 +248,7 @@ Images attached:        2
 
 ### `to-items`
 
-Emits an item with an isbn as JSONL for each line in the input stream
+Emits items with the isbn from each line in the input stream as JSONL
 
 Appends: `isbn`
 
