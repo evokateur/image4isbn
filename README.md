@@ -4,7 +4,7 @@ A set of tools to find cover images for ISBNs, with the ability to retrieve item
 
 ## Tools
 
-Composable into pipelines connected by a stream of items as JSONL data. Schema is append-only. Fields are added as the item moves through the pipeline. Nothing is ever removed or mutated.
+Commands are composable into pipelines connected by a stream of JSONL data. Schema is append-only. Fields are added as items move through the pipeline. Nothing is removed or mutated.
 
 ### `square-fetch-items`
 
@@ -13,7 +13,10 @@ Fetches items from a Square catalog, emitting JSONL
 Appends: `id`, `isbn`, and attributes specified in `SQUARE_OTHER_ATTRIBUTE_NAMES`)
 
 ```sh
-√ ~ $ square-fetch-items | jq .
+square-fetch-items | jq .
+```
+
+```json
 {
   "id": "Q6O257AKWZXONAM33IDHVJDS",
   "isbn": "9780140434088",
@@ -41,7 +44,9 @@ Makes API calls to find cover images for each item.
 Reads: `isbn`; Appends: `images`, `failed_api_calls`
 
 ```sh
-√ ~ $ square-fetch-items | find-covers --source open_library | jq .
+square-fetch-items | find-covers --source open_library | jq .
+```
+```json
 {
   "id": "Q6O257AKWZXONAM33IDHVJDS",
   "isbn": "9780140434088",
@@ -100,7 +105,7 @@ Reads: `isbn`; Appends: `images`, `failed_api_calls`
 Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
 
 ```sh
-√ ~ $ square-fetch-items | find-covers --source open_library | summarize > report.html && open report.html
+square-fetch-items | find-covers --source open_library | summarize > report.html && open report.html
 ```
 
 <img width="576" height="458" alt="sample-cover-image-report" src="https://github.com/user-attachments/assets/696f3fbf-535e-49ee-bbcb-a1964cc614c5" />
@@ -112,6 +117,10 @@ Downloads each image to a directory as `<isbn>.jpg`.
 Reads: `images[].url`; Appends: `images[].local_path`
 
 ```sh
+square-fetch-items | find-covers --source open_library | download-covers
+```
+
+```json
 {
   "id": "Q6O257AKWZXONAM33IDHVJDS",
   "isbn": "9780140434088",
@@ -174,8 +183,12 @@ Uploads each item's cover image to Square, attaching it to the matching catalog 
 Reads: `id`, `images[].local_path`; Appends: `images[].attached.square_image_id`
 
 ```sh
-√ ~ $ square-fetch-items | find-covers --source open_library | download-covers | square-attach-images | jq .
-Total items:            3 # stderr
+square-fetch-items | find-covers --source open_library | download-covers | square-attach-images | jq .
+```
+
+```sh
+# stderr
+Total items:            3
 No item_id:             0
 No cover:               1
 Already attached:       0
@@ -235,12 +248,12 @@ Images attached:        2
 
 ### `to-items`
 
-Emits an item with an isbn as JSONL for each line in the input stream
+Emits items with the isbn from each line in the input stream as JSONL
 
 Appends: `isbn`
 
 ```sh
-√ ~ $ echo "9780802190734" | to-items | jq . # or cat isbns.txt | to-items..
+echo "9780802190734" | to-items | jq .
 ```
 
 ```json
@@ -249,7 +262,7 @@ Appends: `isbn`
 }
 ```
 
-...which can be piped into `find-covers`  
+Since there's an ISBN, it can be piped into `find-covers`  
 
 ```sh
 echo "9780802190734" | to-items | find-covers --source open_library | jq .
@@ -292,9 +305,9 @@ cp .env.example .env
 
 | Variable | Description |
 |---|---|
-| `SQUARE_ACCESS_TOKEN` | Square Developer access token |
+| `SQUARE_ACCESS_TOKEN` | Square access token |
 | `SQUARE_ENVIRONMENT` | `sandbox` for testing, `production` for the real catalog |
-| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the Square custom attribute for ISBNs. Only needed if it is *not* `isbn`, which is assumed. |
+| `SQUARE_ISBN_ATTRIBUTE_NAME` | Name of the Square custom attribute for ISBNs (default: `isbn`) |
 | `SQUARE_OTHER_ATTRIBUTE_NAMES` | Names of other custom attributes to carry along the pipeline, comma-separated (e.g. `title, author`) |
 | `COVERS_DIR` | Directory for downloaded cover images (default: `covers`) |
 | `GOOGLE_BOOKS_API_KEY` | For using `--source google` |
@@ -302,5 +315,5 @@ cp .env.example .env
 ## Installation
 
 ```sh
-uv tool install -e .
+make install
 ```

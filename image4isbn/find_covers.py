@@ -79,20 +79,22 @@ def source_tag(source):
 
 
 def enrich_item(item, images, failed_calls):
+    existing_urls = {img["url"] for img in item.get("images", []) if img.get("url")}
+    new_images = [img for img in images if img.get("url") not in existing_urls]
     return {
         **item,
-        "images": item.get("images", []) + images,
+        "images": item.get("images", []) + new_images,
         "failed_api_calls": item.get("failed_api_calls", []) + failed_calls,
     }
 
 
-def should_skip(item, source, append, force):
+def should_skip(item, source, alternate, force):
     if force:
         return False
     if item.get("has_square_image"):
         return True
     existing = item.get("images", [])
-    if append:
+    if alternate:
         return any(img.get("source") == source_tag(source) for img in existing)
     return bool(existing)
 
@@ -100,12 +102,12 @@ def should_skip(item, source, append, force):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True, choices=["google", "open_library"])
-    parser.add_argument("--append", action="store_true")
+    parser.add_argument("--alternate", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
-    if args.append and args.force:
-        parser.error("--append and --force are mutually exclusive")
+    if args.alternate and args.force:
+        parser.error("--alternate and --force are mutually exclusive")
 
     for line in sys.stdin:
         line = line.strip()
@@ -115,7 +117,7 @@ def main():
         if not isinstance(item, dict):
             raise ValueError(f"expected a JSON object, got: {line.strip()!r}")
 
-        if should_skip(item, args.source, args.append, args.force):
+        if should_skip(item, args.source, args.alternate, args.force):
             print(json.dumps(item))
             continue
 
