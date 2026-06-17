@@ -4,7 +4,7 @@ A set of tools to find cover images for ISBNs, and attach them to items in a Squ
 
 ## Tools
 
-The commands are meant to be run in a sequence that forms a JSONL pipeline. Schema is append-only – fields are added as items move through it, nothing removed or mutated.
+The commands are meant to be run in a sequence that forms a JSONL pipeline. Schema is append-only – fields are added as items move through, nothing removed or mutated.
 
 ### `square-fetch-items`
 
