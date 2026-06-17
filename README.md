@@ -1,14 +1,14 @@
 # image4isbn
 
-A set of tools to find cover images for ISBNs, with the ability to retrieve items and update images in a Square catalog.
+A set of tools to find cover images for ISBNs and attach them to items in a Square catalog.
 
 ## Tools
 
-Commands are composable into pipelines connected by a stream of JSONL data. Schema is append-only. Fields are added as items move through the pipeline. Nothing is removed or mutated.
+The commands are meant to be run in a sequence that forms a JSONL pipeline. The schema is append-only; fields are added as items move through, nothing removed or mutated.
 
 ### `square-fetch-items`
 
-Fetches items from a Square catalog, emitting JSONL
+Fetches items from a Square catalog.
 
 Appends: `id`, `isbn`, and attributes specified in `SQUARE_OTHER_ATTRIBUTE_NAMES`)
 
@@ -102,7 +102,7 @@ square-fetch-items | find-covers --source open_library | jq .
 
 ### `summarize`
 
-Generates an HTML report showing how many covers were found, a sample of the matched images, and a list of ISBNs for which no cover image was found.
+Generates an HTML report showing how many covers were found, how many were not, etc.
 
 ```sh
 square-fetch-items | find-covers --source open_library | summarize > report.html && open report.html
@@ -112,7 +112,7 @@ square-fetch-items | find-covers --source open_library | summarize > report.html
 
 ### `download-covers`
 
-Downloads each image to a directory as `<isbn>.jpg`.
+Downloads image files to a configured location as `<isbn>.jpg`.
 
 Reads: `images[].url`; Appends: `images[].local_path`
 
@@ -178,7 +178,7 @@ square-fetch-items | find-covers --source open_library | download-covers
 
 ### `square-attach-images`
 
-Uploads each item's cover image to Square, attaching it to the matching catalog item.
+Attaches images to square catalog items.
 
 Reads: `id`, `images[].local_path`; Appends: `images[].attached.square_image_id`
 
@@ -248,7 +248,7 @@ Images attached:        2
 
 ### `to-items`
 
-Emits items with the isbn from each line in the input stream as JSONL
+Emits an item with `isbn` for each line of the input stream.
 
 Appends: `isbn`
 
@@ -262,7 +262,7 @@ echo "9780802190734" | to-items | jq .
 }
 ```
 
-Since there's an ISBN, it can be piped into `find-covers`  
+Since it has an ISBN, it can be piped into `find-covers`  
 
 ```sh
 echo "9780802190734" | to-items | find-covers --source open_library | jq .
