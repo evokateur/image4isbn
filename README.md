@@ -1,6 +1,6 @@
 # image4isbn
 
-A set of tools to find cover images for ISBNs and attach them to items in a Square catalog.
+A set of tools to find cover images for ISBNs, and attach them to items in a Square catalog.
 
 ## Tools
 
